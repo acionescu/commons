@@ -1,0 +1,4 @@
+locations=ftp://ftpuser:ftprepo@localhost/repository/,ftp://ftpuser:ftprepo@localhost/netcell.jar
+mainClass=ro.zg.netcell.control.NodeStarter
+args=localhost
+resourcesToCheckFor=root/config/config.xml
