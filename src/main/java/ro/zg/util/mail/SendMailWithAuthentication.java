@@ -29,7 +29,6 @@ package ro.zg.util.mail;
  Author : Sudhir Ancha
  */
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
