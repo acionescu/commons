@@ -60,8 +60,7 @@ public class ReflectionUtility {
      * @return a Method object
      * @throws Exception
      */
-    public static Method getSetterMethodForField(Object obj, String fieldName)
-	    throws Exception {
+    public static Method getSetterMethodForField(Object obj, String fieldName) throws Exception {
 	StringBuffer methodName = new StringBuffer(64);
 	Field field = null;
 
@@ -70,8 +69,7 @@ public class ReflectionUtility {
 	methodName.append(fieldName.substring(1));
 	field = getFieldForFieldName(obj.getClass(), fieldName);
 
-	return obj.getClass().getMethod(methodName.toString(),
-		new Class[] { field.getType() });
+	return obj.getClass().getMethod(methodName.toString(), new Class[] { field.getType() });
 
     }
 
@@ -85,8 +83,8 @@ public class ReflectionUtility {
      * @throws SecurityException
      * @throws NoSuchMethodException
      */
-    public static Method getSetterMethodForField(Object obj, Field field)
-	    throws SecurityException, NoSuchMethodException {
+    public static Method getSetterMethodForField(Object obj, Field field) throws SecurityException,
+	    NoSuchMethodException {
 	String fieldName = field.getName();
 	StringBuffer methodName = new StringBuffer(64);
 
@@ -94,8 +92,7 @@ public class ReflectionUtility {
 	methodName.append(fieldName.substring(0, 1).toUpperCase());
 	methodName.append(fieldName.substring(1));
 
-	return obj.getClass().getMethod(methodName.toString(),
-		new Class[] { field.getType() });
+	return obj.getClass().getMethod(methodName.toString(), new Class[] { field.getType() });
     }
 
     /**
@@ -107,8 +104,8 @@ public class ReflectionUtility {
      * @throws SecurityException
      * @throws NoSuchMethodException
      */
-    public static Method getGetterMethodForField(Object obj, Field field)
-	    throws SecurityException, NoSuchMethodException {
+    public static Method getGetterMethodForField(Object obj, Field field) throws SecurityException,
+	    NoSuchMethodException {
 	String fieldName = field.getName();
 	StringBuffer methodName = new StringBuffer(64);
 	String fieldType = field.getType().getSimpleName();
@@ -124,8 +121,8 @@ public class ReflectionUtility {
 	return obj.getClass().getMethod(methodName.toString(), new Class[0]);
     }
 
-    public static Method getGetterMethodForField(Object obj, String fieldName)
-	    throws SecurityException, NoSuchMethodException {
+    public static Method getGetterMethodForField(Object obj, String fieldName) throws SecurityException,
+	    NoSuchMethodException {
 	StringBuffer methodName = null;
 
 	StringBuffer capitalMethodName = new StringBuffer(64);
@@ -135,8 +132,7 @@ public class ReflectionUtility {
 	for (String prefix : getterPrefixes) {
 	    methodName = new StringBuffer(64);
 	    methodName.append(prefix).append(capitalMethodName);
-	    Method getter = obj.getClass().getMethod(methodName.toString(),
-		    new Class[0]);
+	    Method getter = obj.getClass().getMethod(methodName.toString(), new Class[0]);
 	    if (getter != null) {
 		return getter;
 	    }
@@ -144,8 +140,7 @@ public class ReflectionUtility {
 	return null;
     }
 
-    public static boolean hasGetterForProperty(String propName, Object target)
-	    throws Exception {
+    public static boolean hasGetterForProperty(String propName, Object target) throws Exception {
 	Field f = getFieldForFieldName(target.getClass(), propName);
 	Method getter = getGetterMethodForField(target, f);
 	return getter != null;
@@ -163,8 +158,7 @@ public class ReflectionUtility {
      * @throws Exception
      *             can throw field access exceptions
      */
-    public static void setValueToField(Object obj, Field field, String value)
-	    throws Exception {
+    public static void setValueToField(Object obj, Field field, String value) throws Exception {
 	String typeName = field.getType().getSimpleName();// gets the type of
 	// the field
 	Method setterMethod = null;
@@ -185,8 +179,7 @@ public class ReflectionUtility {
 	 */
 	if (field.getType().isEnum()) {
 	    Object enumVal = Class.forName(field.getType().getName())
-		    .getMethod("valueOf", new Class[] { String.class })
-		    .invoke(null, new Object[] { value });
+		    .getMethod("valueOf", new Class[] { String.class }).invoke(null, new Object[] { value });
 	    valueObject = new Object[] { enumVal };
 	} else if (typeName.equals("int")) {
 	    valueObject = new Object[] { new Integer(value) };
@@ -223,8 +216,7 @@ public class ReflectionUtility {
 	    Date d = sdf.parse(value);
 	    valueObject = new Object[] { d };
 	} else if (typeName.equals("List")) {
-	    List listObj = (List) getGetterMethodForField(obj, field).invoke(
-		    obj, new Object[0]);
+	    List listObj = (List) getGetterMethodForField(obj, field).invoke(obj, new Object[0]);
 	    if (listObj == null) {
 		if (!field.getType().isInterface()) {
 		    listObj = (List) field.getType().newInstance();
@@ -235,8 +227,7 @@ public class ReflectionUtility {
 		if (setterMethod != null) {
 		    setterMethod.invoke(obj, new Object[] { listObj });
 		} else {
-		    throw new Exception("No setter method found for field "
-			    + field.getName());
+		    throw new Exception("No setter method found for field " + field.getName());
 		}
 	    }
 	    if (listObj != null) {
@@ -247,14 +238,13 @@ public class ReflectionUtility {
 	    valueObject = new Object[] { value };
 	}
 	if (setterMethod == null) { // no setter method found
-	    throw new Exception("No setter method found for field "
-		    + field.getName());
+	    throw new Exception("No setter method found for field " + field.getName());
 	}
 	try {
 	    setterMethod.invoke(obj, valueObject);// sets the value
 	} catch (Exception e) {
-	    throw new Exception("Failed to set property '" + field.getName()
-		    + "' with value '" + value + "' on object " + obj, e);
+	    throw new Exception("Failed to set property '" + field.getName() + "' with value '" + value
+		    + "' on object " + obj, e);
 	}
     }
 
@@ -341,14 +331,11 @@ public class ReflectionUtility {
      * @param value
      * @throws Exception
      */
-    public static void setValueToField(Object obj, String fieldName,
-	    String value) throws Exception {
-	setValueToField(obj, getFieldForFieldName(obj.getClass(), fieldName),
-		value);
+    public static void setValueToField(Object obj, String fieldName, String value) throws Exception {
+	setValueToField(obj, getFieldForFieldName(obj.getClass(), fieldName), value);
     }
 
-    public static Field getFieldForFieldName(Class<?> clazz, String fieldName)
-	    throws Exception {
+    public static Field getFieldForFieldName(Class<?> clazz, String fieldName) throws Exception {
 	Field field = null;
 	Class<?> currentClazz = clazz;
 	if (fieldName.contains(".")) {
@@ -370,17 +357,14 @@ public class ReflectionUtility {
 	    }
 	}
 	if (field == null) {
-	    throw new NoSuchFieldException("No field with name " + fieldName
-		    + " found on class " + clazz.getName());
+	    throw new NoSuchFieldException("No field with name " + fieldName + " found on class " + clazz.getName());
 	}
 	return field;
     }
 
-    public static void setValueToField(Object obj, String fieldName,
-	    Object refObj) throws Exception {
+    public static void setValueToField(Object obj, String fieldName, Object refObj) throws Exception {
 	/*
-	 * in case we want to set a nested object property, we use
-	 * prop1.prop2.prop3
+	 * in case we want to set a nested object property, we use prop1.prop2.prop3
 	 */
 	if (fieldName.contains(".")) {
 	    String[] propSequence = fieldName.split("\\.");
@@ -388,42 +372,34 @@ public class ReflectionUtility {
 	    int seqLength = propSequence.length - 1;
 	    /* iterate through the nested objects */
 	    for (int i = 0; i < seqLength; i++) {
-		System.out.println("get value "+propSequence[i]+ " from "+currentObj);
+		System.out.println("get value " + propSequence[i] + " from " + currentObj);
 		currentObj = getValueForField(currentObj, propSequence[i]);
-		
-		if(currentObj == null) {
+
+		if (currentObj == null) {
 		    ExceptionContext ec = new ExceptionContext();
-		    ec.put("reason","NULL_TARGET_OBJECT");
+		    ec.put("reason", "NULL_TARGET_OBJECT");
 		    ec.put("targetObj", obj);
-		    ec.put("fieldPath",fieldName);
-		    ec.put("nullObjectIndex",i);
-		    
-		    throw new ContextAwareException("SET_VALUE_ERROR",ec);
+		    ec.put("fieldPath", fieldName);
+		    ec.put("nullObjectIndex", i);
+
+		    throw new ContextAwareException("SET_VALUE_ERROR", ec);
 		}
 	    }
-	    
+
 	    /*
-	     * once the object on which we want to set the property is obtained,
-	     * we do it
+	     * once the object on which we want to set the property is obtained, we do it
 	     */
-	    setValueToField(
-		    currentObj,
-		    getFieldForFieldName(currentObj.getClass(),
-			    propSequence[seqLength]), refObj);
+	    setValueToField(currentObj, getFieldForFieldName(currentObj.getClass(), propSequence[seqLength]), refObj);
 	} else {
-	    setValueToField(obj,
-		    getFieldForFieldName(obj.getClass(), fieldName), refObj);
+	    setValueToField(obj, getFieldForFieldName(obj.getClass(), fieldName), refObj);
 	}
     }
 
-    public static Collection<?> createCollection(Class<?> clazz,
-	    Collection<?> values) throws Exception {
-	return (Collection<?>) clazz.getConstructor(Collection.class)
-		.newInstance(values);
+    public static Collection<?> createCollection(Class<?> clazz, Collection<?> values) throws Exception {
+	return (Collection<?>) clazz.getConstructor(Collection.class).newInstance(values);
     }
 
-    public static Map<?, ?> createMap(Class<?> clazz, Collection<?> values,
-	    String keyProp) throws Exception {
+    public static Map<?, ?> createMap(Class<?> clazz, Collection<?> values, String keyProp) throws Exception {
 	Map map = (Map) clazz.getConstructor().newInstance();
 	for (Object v : values) {
 	    map.put(getValueForField(v, keyProp), v);
@@ -432,31 +408,26 @@ public class ReflectionUtility {
     }
 
     /**
-     * Tries to set a value of type Object for the specified field on the
-     * specified object
+     * Tries to set a value of type Object for the specified field on the specified object
      * 
      * @param obj
      * @param field
      * @param refObj
      * @throws Exception
      */
-    public static void setValueToField(Object obj, Field field, Object refObj)
-	    throws Exception {
+    public static void setValueToField(Object obj, Field field, Object refObj) throws Exception {
 	Class<?> fieldType = field.getType();
 	try {
 	    /* if the value type matches the field type */
-	    if (refObj == null
-		    || areTypesCompatible(refObj.getClass(), fieldType)) {
+	    if (refObj == null || areTypesCompatible(refObj.getClass(), fieldType)) {
 		// if (refObj == null ||
 		// fieldType.isAssignableFrom(refObj.getClass())) {
-		getSetterMethodForField(obj, field).invoke(obj,
-			new Object[] { refObj });// sets the value
+		getSetterMethodForField(obj, field).invoke(obj, new Object[] { refObj });// sets the value
 	    } else if (refObj instanceof String) {// if string try to guess the
 		// type
 		setValueToField(obj, field, (String) refObj);
 	    } else if (fieldType.getName().equals("java.util.List")) {
-		List listObj = (List) getGetterMethodForField(obj, field)
-			.invoke(obj, new Object[0]);
+		List listObj = (List) getGetterMethodForField(obj, field).invoke(obj, new Object[0]);
 		if (listObj == null) {
 		    if (!field.getType().isInterface()) {
 			listObj = (List) field.getType().newInstance();
@@ -464,39 +435,34 @@ public class ReflectionUtility {
 			listObj = new Vector(); // use Vector as default
 						// implementation of List
 		    }
-		    getSetterMethodForField(obj, field).invoke(obj,
-			    new Object[] { listObj });
+		    getSetterMethodForField(obj, field).invoke(obj, new Object[] { listObj });
 		}
 		listObj.add(refObj);
 
 	    } else {
-		throw new Exception("field's class type <<"
-			+ fieldType.getName() + ">> and object's class type <<"
+		throw new Exception("field's class type <<" + fieldType.getName() + ">> and object's class type <<"
 			+ refObj.getClass().getName() + ">> don't match");
 	    }
 	} catch (Exception e) {
-	    throw new Exception("Failed to set value " + refObj + " to field "
-		    + field.getName() + " for type " + obj.getClass(), e);
+	    throw new Exception("Failed to set value " + refObj + " to field " + field.getName() + " for type "
+		    + obj.getClass(), e);
 	}
     }
 
-    public static Object createObjectByTypeAndValue(Class<?> type, String value)
-	    throws ContextAwareException {
+    public static Object createObjectByTypeAndValue(Class<?> type, String value) throws ContextAwareException {
 	if (value == null) {
 	    return null;
 	}
 
 	if (type.isEnum()) {
 	    try {
-		return Class.forName(type.getName())
-			.getMethod("valueOf", new Class[] { String.class })
+		return Class.forName(type.getName()).getMethod("valueOf", new Class[] { String.class })
 			.invoke(null, new Object[] { value });
 	    } catch (Exception e) {
 		ExceptionContext ec = new ExceptionContext();
 		ec.put(new GenericNameValue("type", type));
 		ec.put(new GenericNameValue("value", value));
-		throw new ContextAwareException("TYPE_CONVERSION_EXCEPTION", e,
-			ec);
+		throw new ContextAwareException("TYPE_CONVERSION_EXCEPTION", e, ec);
 	    }
 	} else if (type.isAssignableFrom(Class.class)) {
 	    if ("".equals(value.trim())) {
@@ -514,8 +480,7 @@ public class ReflectionUtility {
 	return createObjectByTypeAndValue(type.getSimpleName(), value);
     }
 
-    public static Object createObjectByTypeAndValue(String typeName,
-	    String value) throws ContextAwareException {
+    public static Object createObjectByTypeAndValue(String typeName, String value) throws ContextAwareException {
 	Object newValue = value;
 	try {
 	    if (typeName.equals("String")) {
@@ -565,8 +530,7 @@ public class ReflectionUtility {
 		    ExceptionContext ec = new ExceptionContext();
 		    ec.put(new GenericNameValue("format", "dd.MM.yyyy"));
 		    ec.put(new GenericNameValue("string", value));
-		    throw new ContextAwareException(
-			    "DATE_CONVERSION_EXCEPTION", e, ec);
+		    throw new ContextAwareException("DATE_CONVERSION_EXCEPTION", e, ec);
 		}
 		newValue = d;
 	    } else if (typeName.equals("Object")) {
@@ -594,8 +558,7 @@ public class ReflectionUtility {
      * @param args
      * @throws Exception
      */
-    public static Object callMethod(Object obj, String methodName, Object[] args)
-	    throws Exception {
+    public static Object callMethod(Object obj, String methodName, Object[] args) throws Exception {
 	// Class<?>[] paramTypes = null;
 	// if (args != null) {
 	// paramTypes = new Class[args.length];
@@ -625,50 +588,41 @@ public class ReflectionUtility {
 	return paramTypes;
     }
 
-    public static Object callMethod(Object obj, String methodName,
-	    Object[] args, Class<?>[] types) throws Exception {
+    public static Object callMethod(Object obj, String methodName, Object[] args, Class<?>[] types) throws Exception {
 	Method method = null;
 	try {
 	    method = obj.getClass().getMethod(methodName, types);
-	} catch (Exception e) {
-	    // for(Method m : obj.getClass().getMethods()) {
-	    // System.out.println(m);
-	    // }
-
-	    throw new Exception("Failed to call method '" + methodName + "("
-		    + types + ")' on class " + obj.getClass() + " for args "
-		    + args, e);
-	}
-	if (method != null) {
 	    return method.invoke(obj, args);
+	} catch (Exception e) {
+
+	    ExceptionContext ec = new ExceptionContext();
+	    ec.put("className", obj.getClass().getName());
+	    ec.put("methodName", methodName);
+	    ec.put("argsTypes", Arrays.asList(types));
+	    ec.put("args", Arrays.asList(args));
+	    throw new ContextAwareException("METHOD_CALL_ERROR", e, ec);
+
 	}
-	ExceptionContext ec = new ExceptionContext();
-	ec.put("className", obj.getClass().getName());
-	ec.put("methodName", methodName);
-	ec.put("argsTypes", Arrays.asList(types));
-	ec.put("args", Arrays.asList(args));
-	throw new ContextAwareException("METHOD_CALL_ERROR", ec);
+
     }
 
-    public static Object callStaticMetod(String className, String methodName,
-	    Object[] args, String[] types) throws Exception {
+    public static Object callStaticMetod(String className, String methodName, Object[] args, String[] types)
+	    throws Exception {
 	Class<?>[] ctypes = updateArgsForTypes(args, types);
 	return callStaticMethod(className, methodName, args, ctypes);
     }
 
-    public static Object callStaticMethod(String className, String methodName,
-	    Object[] args, Class<?>[] types) throws Exception {
+    public static Object callStaticMethod(String className, String methodName, Object[] args, Class<?>[] types)
+	    throws Exception {
 	Method method = Class.forName(className).getMethod(methodName, types);
 	return method.invoke(null, args);
     }
 
-    public static Object callStaticMethod(String className, String methodName,
-	    Object[] args) throws Exception {
+    public static Object callStaticMethod(String className, String methodName, Object[] args) throws Exception {
 	return callStaticMethod(className, methodName, args, getTypes(args));
     }
 
-    public static Object callMethod(Object obj, String methodName,
-	    Object[] args, String[] types) throws Exception {
+    public static Object callMethod(Object obj, String methodName, Object[] args, String[] types) throws Exception {
 	// Class<?>[] ctypes = new Class<?>[types.length];
 	// for (int i = 0; i < types.length; i++) {
 	// String t = types[i];
@@ -690,8 +644,7 @@ public class ReflectionUtility {
 	return callMethod(obj, methodName, args, ctypes);
     }
 
-    private static Class<?>[] updateArgsForTypes(Object[] args, String[] types)
-	    throws Exception {
+    private static Class<?>[] updateArgsForTypes(Object[] args, String[] types) throws Exception {
 	Class<?>[] ctypes = new Class<?>[types.length];
 	for (int i = 0; i < types.length; i++) {
 	    String t = types[i];
@@ -700,8 +653,7 @@ public class ReflectionUtility {
 		    t = t.substring(t.indexOf(":") + 1);
 		    Class<?> clazz = Class.forName(t);
 		    ctypes[i] = (Class<?>) clazz.getField("TYPE").get(clazz);
-		    args[i] = createObjectByTypeAndValue(
-			    ctypes[i].getSimpleName(), args[i].toString());
+		    args[i] = createObjectByTypeAndValue(ctypes[i].getSimpleName(), args[i].toString());
 		} else {
 		    ctypes[i] = Class.forName(t);
 		}
@@ -720,8 +672,7 @@ public class ReflectionUtility {
      * @return
      * @throws Exception
      */
-    public static Object getValueForField(Object obj, String fieldName)
-	    throws Exception {
+    public static Object getValueForField(Object obj, String fieldName) throws Exception {
 	if (!".*".equals(fieldName) && fieldName.contains(".")) {
 	    String[] props = fieldName.split("\\.");
 	    Object target = obj;
@@ -745,14 +696,12 @@ public class ReflectionUtility {
 	    } else if (obj.getClass().isArray()) {
 		return ((Object[]) obj)[Integer.parseInt(fieldName)];
 	    }
-	    throw new Exception("No field '" + fieldName + "' on object "
-		    + obj.getClass());
+	    throw new Exception("No field '" + fieldName + "' on object " + obj.getClass());
 	}
     }
 
     /**
-     * Tests if the type of the field with the name propName matches searchClass
-     * type
+     * Tests if the type of the field with the name propName matches searchClass type
      * 
      * @param object
      * @param propName
@@ -761,8 +710,8 @@ public class ReflectionUtility {
      * @throws Exception
      * @throws NoSuchFieldException
      */
-    public static boolean checkFieldType(Object object, String propName,
-	    Class<?> searchClass) throws Exception, NoSuchFieldException {
+    public static boolean checkFieldType(Object object, String propName, Class<?> searchClass) throws Exception,
+	    NoSuchFieldException {
 
 	// Field f = object.getClass().getDeclaredField(propName);
 	Field f = getFieldForFieldName(object.getClass(), propName);
@@ -776,8 +725,7 @@ public class ReflectionUtility {
 	}
     }
 
-    public static boolean areTypesCompatible(Class<?> sourceClass,
-	    Class<?> targetClass) throws Exception {
+    public static boolean areTypesCompatible(Class<?> sourceClass, Class<?> targetClass) throws Exception {
 	try {
 
 	    if (sourceClass.isPrimitive()) {
@@ -795,8 +743,7 @@ public class ReflectionUtility {
 	}
     }
 
-    public static Class<?> getPrimitiveType(Class<?> c)
-	    throws ContextAwareException {
+    public static Class<?> getPrimitiveType(Class<?> c) throws ContextAwareException {
 	try {
 	    return (Class<?>) c.getField("TYPE").get(c);
 	} catch (Exception e) {
@@ -807,16 +754,14 @@ public class ReflectionUtility {
     }
 
     private static String escapeString(String input) {
-	return defaultCollectionMapParser.ESCAPE + input
-		+ defaultCollectionMapParser.ESCAPE;
+	return defaultCollectionMapParser.ESCAPE + input + defaultCollectionMapParser.ESCAPE;
     }
 
     public static String objectToString(Object obj) throws Exception {
 	return objectToString(obj, false);
     }
 
-    public static String objectToString(Object obj, boolean escapeString)
-	    throws Exception {
+    public static String objectToString(Object obj, boolean escapeString) throws Exception {
 	if (obj == null) {
 	    return null;
 	}
@@ -842,8 +787,7 @@ public class ReflectionUtility {
 	}
     }
 
-    public static void recursiveObjectToString(Object obj, Class<?> type,
-	    Map<String, Object> holder) throws Exception {
+    public static void recursiveObjectToString(Object obj, Class<?> type, Map<String, Object> holder) throws Exception {
 	if (type == null) {
 	    if (obj == null) {
 		return;
@@ -888,22 +832,19 @@ public class ReflectionUtility {
 	}
     }
 
-    public static Map<Object, Object> mapToString(Map<Object, Object> sourceMap)
-	    throws Exception {
+    public static Map<Object, Object> mapToString(Map<Object, Object> sourceMap) throws Exception {
 	if (sourceMap == null) {
 	    return null;
 	}
 	Map<Object, Object> response = new LinkedHashMap<Object, Object>();
 
 	for (Map.Entry<Object, Object> entry : sourceMap.entrySet()) {
-	    response.put(objectToString(entry.getKey()),
-		    objectToString(entry.getValue(), true));
+	    response.put(objectToString(entry.getKey()), objectToString(entry.getValue(), true));
 	}
 	return response;
     }
 
-    public static List<Object> collectionToString(Collection<Object> sourceList)
-	    throws Exception {
+    public static List<Object> collectionToString(Collection<Object> sourceList) throws Exception {
 	if (sourceList == null) {
 	    return null;
 	}
