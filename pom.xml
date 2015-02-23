@@ -11,7 +11,7 @@
    <groupId>com.github.acionescu</groupId>
    <artifactId>commons</artifactId>
    <name>commons</name>
-   <version>0.0.3-SNAPSHOT</version>
+   <version>0.0.2-SNAPSHOT</version>
    <description />
    <url>https://github.com/acionescu/commons</url>
    <packaging>jar</packaging>
@@ -58,16 +58,9 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-               <execution>
-                  <id>sign-artifacts</id>
-                  <phase>verify</phase>
-                  <goals>
-                     <goal>sign</goal>
-                  </goals>
-               </execution>
-            </executions>
+            <configuration>
+               <skip>true</skip>
+            </configuration>
          </plugin>
          <plugin>
             <groupId>org.sonatype.plugins</groupId>
