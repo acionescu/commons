@@ -10,7 +10,7 @@
    <groupId>com.github.acionescu</groupId>
    <artifactId>commons</artifactId>
    <name>commons</name>
-   <version>0.0.2</version>
+   <version>0.0.3-SNAPSHOT</version>
    <description />
    <url>https://github.com/acionescu/commons</url>
    <packaging>jar</packaging>
