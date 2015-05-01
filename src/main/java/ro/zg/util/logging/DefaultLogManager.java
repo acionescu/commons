@@ -22,6 +22,18 @@ public class DefaultLogManager implements LogManager{
     private LoggerFactory defaultLoggerFactory = new SystemOutLoggerFactory();
     private Logger defaultLogger = new SystemOutLogger("DefaultLogger");
     private Map<String,Logger> loggers = new Hashtable<String, Logger>();
+    
+
+    public DefaultLogManager(LoggerFactory defaultLoggerFactory, Logger defaultLogger) {
+	super();
+	this.defaultLoggerFactory = defaultLoggerFactory;
+	this.defaultLogger = defaultLogger;
+    }
+
+    public DefaultLogManager() {
+	super();
+	// TODO Auto-generated constructor stub
+    }
 
     public synchronized Logger getLogger(String name) {
 	Logger logger = loggers.get(name);

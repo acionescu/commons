@@ -16,7 +16,8 @@
 package ro.zg.util.logging;
 
 public class MasterLogManager{
-    private static LogManager defaultLogManager = new DefaultLogManager();
+    private static LogManager defaultLogManager = new DefaultLogManager(new Log4jLoggerFactory(),null);
+    
 
     public static Logger getLogger(Class<?> clazz) {
 	return defaultLogManager.getLogger(clazz);
