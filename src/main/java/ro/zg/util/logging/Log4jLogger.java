@@ -43,7 +43,7 @@ public class Log4jLogger implements Logger{
 
     @Override
     public void info(Object message) {
-	log4jLogger.debug(message);
+	log4jLogger.info(message);
     }
 
     @Override

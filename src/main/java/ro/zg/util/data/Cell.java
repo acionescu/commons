@@ -16,13 +16,18 @@
 package ro.zg.util.data;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class Cell {
+
+    /**
+     * In case this is a value cell, then data is the actual character that the cell holds. <br/>
+     * <br/>
+     * In case this is a ref ( link ) cell , then data is the strength of the link. <br/>
+     * The strength can be increased, when the link is used, or decreased as the link is bypassed during a search
+     */
     protected char data;
     protected Cell value;
     protected Cell ref;
@@ -47,10 +52,11 @@ public class Cell {
     private static final char DELETE_REF = 'o';
     private static final char SELECT_VALUE = 'p';
     private static final char SELECT_REF = 'r';
+    private static final char SELECT_DATA = 's';
 
     public static final char[] operations = new char[] { POP_VALUE, PUSH_VALUE, SELECT_VALUE, SELECT_REF, POP_REF,
 	    PUSH_REF, COPY_TO_VALUE, COPY_FROM_VALUE, COPY_TO_REF, COPY_FROM_REF, SWITCH, VALUE_EQ_REF, REF_EQ_VALUE,
-	    PUSH_VALUE_TO_REF, PUSH_REF_TO_VALUE, DELETE_VALUE, DELETE_REF };
+	    PUSH_VALUE_TO_REF, PUSH_REF_TO_VALUE, DELETE_VALUE, DELETE_REF, SELECT_DATA };
 
     public Cell(char data, Cell ref) {
 	super();
@@ -165,11 +171,13 @@ public class Cell {
 	return '0';
     }
 
-    public Cell getRef(char c, boolean create) {
+    public Cell getRefValue(char c, boolean create) {
 	Cell next = ref;
 	Cell prev = null;
 	while (next != null) {
 	    if (next.value != null && next.value.data == c) {
+		/* don't just swap the next with the prev, but increase the strength of the used ref */
+
 		/* bring the found cell to front */
 		if (prev != null) {
 		    Cell followers = next.ref;
@@ -177,9 +185,15 @@ public class Cell {
 		    ref = next;
 		    prev.ref = followers;
 		}
+		/* increase strength of the used ref */
+		next.data += 20;
 		return next.value;
 	    }
 	    prev = next;
+	    /* decrease strength of prev link if it didn't satisfy the search */
+	    if (next.data > 0) {
+		next.data--;
+	    }
 	    next = next.ref;
 	}
 	if (create) {
@@ -191,6 +205,10 @@ public class Cell {
 	    return newVal;
 	}
 	return null;
+    }
+
+    public boolean contains(char c) {
+	return getRefValue(c, false) != null;
     }
 
     public Cell getValue(char c) {
@@ -223,6 +241,7 @@ public class Cell {
 	if (lastRef == null) {
 	    lastRef = ref;
 	}
+	ref.data += 100;
     }
 
     public void addRef(Cell c) {
@@ -233,55 +252,95 @@ public class Cell {
 	    lastRef.ref = new Cell(c);
 	    lastRef = lastRef.ref;
 	}
+	lastRef.data += 100;
     }
 
-    public Cell index(String s) {
+    /**
+     * Index exhaustively every character with every continuation, regardless of its position in the processed text
+     * 
+     * @param s
+     * @return
+     */
+    public Cell indexMaximal(String s) {
 	if (s == null) {
 	    return this;
 	}
 	Cell prev = this;
 	for (int i = 0; i < s.length(); i++) {
 	    char c = s.charAt(i);
-	    Cell current = null;
-	    if (i > 0) {
-		current = prev.getRef(c, true);
-	    } else {
-		current = new Cell(c);
-	    }
-	    current.position = i;
-	    // current.pushValue(prev);
-
+	    // Cell current = null;
 	    // if (i > 0) {
-	    // this.getRef(prev.data, true).pushRef(current);
-	    // this.getRef(c, true).pushRef(current);
-	    this.getRef(c, true).addRef(current);
+	    // current = prev.getRef(c, true);
+	    // } else {
+	    // current = new Cell(c);
 	    // }
-
+	    Cell current = prev.getRefValue(c, true);
+	    current.position = i;
+	    if (i > 0) {
+		this.getRefValue(prev.data, true).addRef(current);
+	    }
+	    // this.getRef(c, true).addRef(current);
 	    prev = current;
 	}
 	return prev;
     }
 
-    public void digest(String s) {
+    /**
+     * Index without redundancy, just make a tree with possile continuations, where each node is a referenct to the top
+     * level one containing the used char
+     * 
+     * @param s
+     * @return
+     */
+    public Cell indexMinimal(String s) {
 	if (s == null) {
-	    return;
+	    return this;
 	}
-	for (int k = 0; k < (s.length() - 1); k++) {
-	    Cell prev = this;
-	    for (int i = k; i < s.length(); i++) {
-		char c = s.charAt(i);
-		Cell current = prev.getRef(c, true);
-		prev = current;
+	Cell prev = this;
+	for (int i = 0; i < s.length(); i++) {
+	    char c = s.charAt(i);
+	    /* get/create top level cell */
+	    Cell current = this.getRefValue(c, true);
+	    if (i > 0 && prev.getRefValue(c, false) == null) {
+		prev.addRef(current);
 	    }
+	    prev = current;
 	}
+	return prev;
+    }
 
-	for (int k = (s.length() - 1); k > 0; k--) {
-	    Cell prev = this;
-	    for (int i = k; i >= 0; i--) {
-		char c = s.charAt(i);
-		Cell current = prev.getRef(c, true);
-		prev = current;
-	    }
+    // public void digest(String s) {
+    // if (s == null) {
+    // return;
+    // }
+    // for (int k = 0; k < (s.length() - 1); k++) {
+    // Cell prev = this;
+    // for (int i = k; i < s.length(); i++) {
+    // char c = s.charAt(i);
+    // Cell current = prev.getRefValue(c, true);
+    // prev = current;
+    // }
+    // }
+    //
+    // for (int k = (s.length() - 1); k > 0; k--) {
+    // Cell prev = this;
+    // for (int i = k; i >= 0; i--) {
+    // char c = s.charAt(i);
+    // Cell current = prev.getRefValue(c, true);
+    // prev = current;
+    // }
+    // }
+    // }
+
+    /**
+     * Assimilates the characters of this string
+     * 
+     * @param s
+     */
+    public void tokens(String s) {
+	for (int i = 0; i < s.length(); i++) {
+	    char c = s.charAt(i);
+	    getRefValue(c, true);
 	}
     }
 
@@ -291,7 +350,7 @@ public class Cell {
 	}
 	Cell result = new Cell();
 	char firstChar = s.charAt(0);
-	Cell next = this.getRef(firstChar, false);
+	Cell next = this.getRefValue(firstChar, false);
 
 	// if (next != null) {
 	// next = next.ref;
@@ -303,12 +362,14 @@ public class Cell {
 	    // if (last == null) {
 	    // continue;
 	    // }
-	    for (int i = 0; i < s.length(); i++) {
+	    for (int i = 1; i < s.length(); i++) {
 		char c = s.charAt(i);
-		last = last.getRef(c, false);
+		last = last.getRefValue(c, false);
 		if (last == null) {
+
 		    break;
 		}
+
 	    }
 	    if (last != null && last.ref != null) {
 		last = last.ref.value;
@@ -333,7 +394,7 @@ public class Cell {
 	    return new Interval(startPos, endPos);
 	}
 	char firstChar = s.charAt(0);
-	Cell next = this.getRef(firstChar, false);
+	Cell next = this.getRefValue(firstChar, false);
 	// if (next != null) {
 	// next = next;
 	// }
@@ -343,7 +404,7 @@ public class Cell {
 	    eos = false;
 	    for (int i = 0; i < s.length(); i++) {
 		char c = s.charAt(i);
-		last = last.getRef(c, false);
+		last = last.getRefValue(c, false);
 		if (last == null) {
 		    break;
 		}
@@ -457,7 +518,10 @@ public class Cell {
 	case DELETE_REF:
 	    target.ref = null;
 	    break;
+	case SELECT_DATA:
+	    return new Cell(target.data);
 	}
+
 	return target;
     }
 
@@ -478,35 +542,38 @@ public class Cell {
 	return result;
     }
 
-    
-
-    public String print(StringBuffer result, String offset, Set<Cell> processed) {
+    public String print(StringBuffer result, String offset, Set<Cell> processed, int count, int depth) {
 
 	String newLine = "\n";
-	if (data != (char) 0) {
-	    if (processed.contains(this)) {
-		return result.toString();
-	    }
-	    processed.add(this);
 
+	if (processed.contains(this) || depth <= 0) {
+	    return result.toString();
+	}
+	if (data != (char) 0) {
+	    processed.add(this);
 	    result.append(data);
 	}
 
-	if (value != null) {
-	    value.print(result, offset + " ", processed);
+	if (value != null && depth > 0) {
+	    value.print(result, offset + " ", processed, count, --depth);
 	}
-	result.append(newLine);
-	result.append(offset);
 
-	if (ref != null) {
-	    ref.print(result, offset, processed);
+	// if (depth <= 0) {
+	// return result.toString();
+	// }
+
+	if (ref != null && count > 0) {
+	    result.append(newLine);
+	    result.append(offset);
+	    ref.print(result, offset, processed, count, depth);
 	}
 
 	return result.toString();
     }
 
     public String print() {
-	return print(new StringBuffer(), "", new HashSet<Cell>());
+	return print(new StringBuffer(), "", new HashSet<Cell>(), 3, 30);
+	// return printValuesWithDepth(new StringBuffer(), 40, (char) 0);
     }
 
     public void printData(StringBuffer sb) {
@@ -528,17 +595,105 @@ public class Cell {
 	return sb.toString();
     }
 
-    public String printRefs() {
-	StringBuffer sb = new StringBuffer();
+    public String printRefs(StringBuffer sb) {
+	if (sb == null) {
+	    sb = new StringBuffer();
+	}
 	Cell next = ref;
 	while (next != null) {
 	    if (next.value != null) {
 		next.value.printData(sb);
+		// sb.append("\n");
+		// next.value.printRefs(sb);
 	    }
 	    next = next.ref;
 	}
 
 	return sb.toString();
+    }
+
+    /**
+     * Prints digested format
+     * 
+     * @param sb
+     * @param depth
+     * @param offset
+     * @param stopChars
+     * @param rec
+     * @return
+     */
+    public String printValuesWithDepth(StringBuffer sb, int depth, String offset, Cell stopChars, int rec) {
+	/* stop either when the max allowed depth is reached or a stop char is encountered */
+	if (depth <= 0 /* || (rec > 1 && stopChars.contains(data)) */) {
+	    return null;
+	}
+
+	depth--;
+
+	// printData(sb);
+	Cell next = ref;
+	if (next == null) {
+	    next = this;
+	}
+	while (next != null && rec < 255) {
+	    if (next.value != null) {
+
+		String out = null;
+		if (stopChars == null || rec < 2 || !stopChars.contains(next.value.data)) {
+		    next.value.printData(sb);
+		    out = next.value.printValuesWithDepth(sb, depth, offset + " ", stopChars, rec + 1);
+
+		}
+
+	    }
+
+	    next = next.ref;
+	    if (next != null) {
+		sb.append("\n");
+		sb.append(offset);
+	    }
+	}
+	/* return full string only for first level results */
+	if (rec < 2) {
+	    sb.append("\n");
+	    return sb.toString();
+	}
+	return null;
+    }
+
+    public String printRefsWithStrength() {
+	StringBuffer sb = new StringBuffer();
+	Cell next = ref;
+	while (next != null) {
+	    if (next.value != null) {
+		sb.append("\n");
+		next.value.printData(sb);
+		sb.append(" - " + (int) next.data);
+	    }
+	    next = next.ref;
+	}
+
+	return sb.toString();
+    }
+
+    public void printIndexed(StringBuffer sb, int rec, boolean withStrength) {
+	Cell next = ref;
+	while (next != null) {
+	    if (withStrength) {
+		sb.append("-" + (int) next.data + "-");
+	    }
+	    next.value.printData(sb);
+	    if (rec < 1) {
+		next.value.printIndexed(sb, rec + 1, withStrength);
+	    } else {
+
+	    }
+	    next = next.ref;
+	    sb.append("\n");
+	    if (rec > 0) {
+		sb.append(" ");
+	    }
+	}
     }
 
     /* tests */
@@ -609,17 +764,54 @@ public class Cell {
 
 	Cell index = new Cell();
 	// index.digest(input);
-	index.index(input);
+	index.indexMaximal(input);
 
-	Cell found = index.search("semantics");
+	index.indexMaximal("Although the study of synaptogenesis within the central nervous system (CNS) is much more recent than that of the NMJ, there is promise of relating the information learned at the NMJ to synapses within the CNS. Many similar structures and basic functions exist between the two types of neuronal connections. At the most basic level, the CNS synapse and the NMJ both have a nerve terminal that is separated from the postsynaptic membrane by a cleft containing specialized extracellular material. Both structures exhibit localized vesicles at the active sites, clustered receptors at the post-synaptic membrane, and glial cells that encapsulate the entire synaptic cleft. In terms of synaptogenesis, both synapses exhibit differentiation of the pre- and post-synaptic membranes following initial contact between the two cells. This includes the clustering of receptors, localized up-regulation of protein synthesis at the active sites, and neuronal pruning through synapse elimination.[3]\n"
+		+ "\n"
+		+ "Despite these similarities in structure, there is a fundamental difference between the two connections. The CNS synapse is strictly neuronal and does not involve muscle fibers: for this reason the CNS uses different neurotransmitter molecules and receptors. More importantly, neurons within the CNS often receive multiple inputs that must be processed and integrated for successful transfer of information. Muscle fibers are innervated by a single input and operate in an all or none fashion. Coupled with the plasticity that is characteristic of the CNS neuronal connections, it is easy to see how increasingly complex CNS circuits can become.[3]");
+
+	index.indexMaximal("The special structure found in the CNS that allows for multiple inputs is the dendritic spine, the highly dynamic site of excitatory synapses. This morphological dynamism is due to the specific regulation of the actin cytoskeleton, which in turn allows for regulation of synapse formation.[12] Dendritic spines exhibit three main morphologies: filopodia, thin spines, and mushroom spines. The filopodia play a role in synaptogenesis through initiation of contact with axons of other neurons. Filopodia of new neurons tend to associate with multiply synapsed axons, while the filopodia of mature neurons tend to sites devoid of other partners. The dynamism of spines allows for the conversion of filopodia into the mushroom spines that are the primary sites of glutamate receptors and synaptic transmission.[13]");
+
+	index.indexMaximal("Start");
+
+	index.search("conv");
+
+	long startTime = System.currentTimeMillis();
+	Cell found = index.search("Se");
+	long duration = System.currentTimeMillis() - startTime;
+
+	System.out.println("Search took " + duration + " ms.");
+
+	Cell stopChars = new Cell();
+	stopChars.tokens(" ,.[]{}();:'\"");
+
+	// System.out.println(stopChars.printValuesWithDepth(new StringBuffer(), 40, (char)0,0));
+
+//	System.out.println(index.printValuesWithDepth(new StringBuffer(), 10000, "", null, 0));
+
+	// System.out.println(index.getRefValue('s', false).printValuesWithDepth(new StringBuffer(), 400, "", stopChars,
+	// 0));
+
+	// System.out.println(index.getRefValue('v', false).ref.printRefsWithStrength());
+
+	// System.out.println(index.getRefValue('\n',false).printRefsWithStrength());
+	 System.out.println(index.printRefsWithStrength());
+
 	if (found != null) {
-//	    System.out.println(found.printRefs());
-	    System.out.println(found.print());
+	    // System.out.println(found.printRefs());
+	    // System.out.println(found.print());
+
+	    // Cell next = found.ref;
+	    // while(next != null) {
+	    // System.out.println(next.value.data+" -> \n"+next.value.printRefsWithStrength());
+	    // next = next.ref;
+	    // }
+
 	}
-//	Interval interval = index.findMatchPos("Z");
-//	System.out.println(interval);
-//	System.out.println("found: " + input.substring((int) interval.getStart(), (int) interval.getEnd()));
-//	System.out.println("before: " + input.substring(0, (int) interval.getStart()));
+	// Interval interval = index.findMatchPos("Z");
+	// System.out.println(interval);
+	// System.out.println("found: " + input.substring((int) interval.getStart(), (int) interval.getEnd()));
+	// System.out.println("before: " + input.substring(0, (int) interval.getStart()));
     }
 
     public static void learn() {
@@ -637,7 +829,7 @@ public class Cell {
 	    lessons++;
 	    if (response == null) {
 		correctResponsesInARow = 0;
-		cell.digest(teach);
+		cell.indexMaximal(teach);
 		// System.out.println("teached: "+teach);
 		// if(cell.search(teach) == null) {
 		// System.out.println("Failed to learn: "+teach);
@@ -654,6 +846,6 @@ public class Cell {
 
     public static void main(String[] args) {
 	// learn();
-	 testDigest();
+	testDigest();
     }
 }

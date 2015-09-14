@@ -48,7 +48,7 @@ public class Encoder {
 	}
 
 	Cell index = new Cell();
-	index.index(current);
+	index.indexMaximal(current);
 
 	for (int i = 0; i < origin.length(); i++) {
 	    String s = origin.substring(i);

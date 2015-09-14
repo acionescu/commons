@@ -17,19 +17,23 @@ package ro.zg.util.bootstrap;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import ro.zg.util.logging.Logger;
+import ro.zg.util.logging.MasterLogManager;
+
 public class GenericBootstrapConfig {
+    private static Logger logger = MasterLogManager.getLogger(GenericBootstrapConfig.class.getName());
     private URL[] urls;
     private String mainClass;
     private String[] args;
     private String[] resourcesToCheckFor;
 
-    public static GenericBootstrapConfig loadFromFile(File f) throws IOException {
+    public static GenericBootstrapConfig loadFromFile(File f) throws Exception {
 	Properties p = new Properties();
 	p.load(new FileInputStream(f));
 	String locations = p.getProperty("locations");
@@ -50,13 +54,65 @@ public class GenericBootstrapConfig {
 
     }
 
-    private List<URL> locationsToURLs(String[] locations) throws IOException {
+    private List<URL> locationsToURLs(String[] locations) throws Exception {
 	ArrayList<URL> l = new ArrayList<URL>();
 	for (String location : locations) {
-	    l.add(new URL(location));
+
+	    int index = location.lastIndexOf("*.jar");
+
+	    if (index > 0) {
+		String sourceDir = location.substring(0, index);
+		
+		File source = new File(new URL(sourceDir).toURI());
+		
+		String[] jarsArray = source.list(new FilenameFilter() {
+
+		    @Override
+		    public boolean accept(File dir, String name) {
+			return name.endsWith(".jar");
+		    }
+		});
+
+		for (String jarName : jarsArray) {
+		    if(logger.isDebugEnabled()) {
+			logger.debug("Adding jar "+jarName);
+		    }
+		    l.add(new URL(sourceDir+jarName));
+		}
+	    } else {
+		l.add(new URL(location));
+	    }
 	}
 	return l;
     }
+    
+    public static void main(String[] args) throws Exception {
+	String location = "file:///media/netcell-node/target/dependency/*.jar";
+   
+	 int index = location.lastIndexOf("*.jar");
+
+	    if (index > 0) {
+		String sourceDir = location.substring(0, index);
+		
+		File source = new File(new URL(sourceDir).toURI());
+		
+		String[] jarsArray = source.list(new FilenameFilter() {
+
+		    @Override
+		    public boolean accept(File dir, String name) {
+			return name.endsWith(".jar");
+		    }
+		});
+
+		for (String jarName : jarsArray) {
+		    if(logger.isDebugEnabled()) {
+			logger.debug("Adding jar "+jarName);
+		    }
+		    System.out.println(new URL(sourceDir+jarName));
+		}
+	    }
+    }
+    
 
     /**
      * @return the urls

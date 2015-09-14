@@ -163,10 +163,6 @@ public class GenericNameValueContextUtil {
     }
 
     public static Object getValueFromContext(GenericNameValueContext context, List<String> names) {
-	if (context == null) {
-	    System.out.println("fuck");
-	}
-
 	String currentName = names.remove(0);
 	Object value = context.getValue(currentName);
 	if (names.size() == 0) {

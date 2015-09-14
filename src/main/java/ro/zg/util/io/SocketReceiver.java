@@ -15,13 +15,20 @@
  ******************************************************************************/
 package ro.zg.util.io;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class SocketReceiver implements Receiver{
+import ro.zg.util.logging.Logger;
+import ro.zg.util.logging.MasterLogManager;
+
+public class SocketReceiver extends AbstractReceiver {
+    private static Logger logger = MasterLogManager.getLogger(SocketReceiver.class.getName());
+
     private int listenPort;
     private SocketProcessor processor;
     private boolean running = false;
+    private ServerSocket serverSocket;
 
     public SocketReceiver() {
 
@@ -32,12 +39,20 @@ public class SocketReceiver implements Receiver{
     }
 
     public void listen() throws Exception {
-	ServerSocket serverSocket = new ServerSocket(listenPort);
-	running = true;
-	System.out.println("Start listening on port "+listenPort);
-	while (running) {
-	    Socket client = serverSocket.accept();
-	    processor.process(client);
+	if (!running) {
+	    try {
+		serverSocket = new ServerSocket(listenPort);
+	    } catch (IOException e) {
+		throw new IOException("Failed to start " + getName() + " on port " + getListenPort(), e);
+	    }
+	    running = true;
+	    logger.info("Started " + getName() + " on port " + getListenPort());
+	    while (running) {
+		Socket client = serverSocket.accept();
+		processor.process(client);
+	    }
+	} else {
+	    throw new RuntimeException("Socket receiver already running on port " + listenPort);
 	}
     }
 
@@ -57,8 +72,11 @@ public class SocketReceiver implements Receiver{
 	this.processor = processor;
     }
 
-    public void shutdown() {
-	// TODO Auto-generated method stub
-	
+    public void shutdown() throws IOException {
+	if (running) {
+	    serverSocket.close();
+	    running = false;
+	}
+
     }
 }

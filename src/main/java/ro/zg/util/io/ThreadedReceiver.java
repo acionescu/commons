@@ -17,8 +17,11 @@ package ro.zg.util.io;
 
 import ro.zg.commons.exceptions.ContextAwareException;
 import ro.zg.commons.exceptions.ExceptionHandler;
+import ro.zg.util.logging.Logger;
+import ro.zg.util.logging.MasterLogManager;
 
 public class ThreadedReceiver extends Thread{
+    private static Logger logger = MasterLogManager.getLogger(ThreadedReceiver.class.getName());
     private Receiver receiver;
     private ExceptionHandler<?> exceptionHandler;
     
@@ -34,11 +37,10 @@ public class ThreadedReceiver extends Thread{
 		try {
 		    exceptionHandler.handle(new ContextAwareException(e));
 		} catch (Exception e1) {
-		    // TODO Auto-generated catch block
-		    e1.printStackTrace();
+		    logger.error("Error handling the exception", e1);
 		}
 	    }
-	    e.printStackTrace();
+	    logger.error("Failed starting the receiver", e);
 	}
     }
 }

@@ -18,4 +18,5 @@ package ro.zg.util.io;
 public interface Receiver {
     void listen() throws Exception;
     void shutdown() throws Exception;
+    String getName();
 }
