@@ -21,7 +21,7 @@
    <groupId>net.segoia</groupId>
    <artifactId>commons</artifactId>
    <name>commons</name>
-   <version>0.0.4</version>
+   <version>0.0.5-SNAPSHOT</version>
    <description>Various Java Utils</description>
    <url>https://github.com/acionescu/commons</url>
    <packaging>jar</packaging>
