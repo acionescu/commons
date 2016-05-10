@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 
 
 public class NameValueContext<P> extends ParameterContext<NameValue<P>>{
@@ -109,6 +111,10 @@ public class NameValueContext<P> extends ParameterContext<NameValue<P>>{
 	    map.put(p.getName(), p.getValue());
 	}
 	return map;
+    }
+    
+    public String toJsonString() {
+	return new Gson().toJson(getNameValuesAsMap());
     }
     
     public boolean containsValue(P value) {

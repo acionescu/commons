@@ -24,6 +24,10 @@ import net.segoia.util.statistics.Monitor;
 public class DefaultMonitoringManager implements MonitoringManager {
     private LogPersister logPersister;
     private Logger localLogger = MasterLogManager.getLogger("MONITORING_MANAGER");
+    
+    public void start() {
+	
+    }
 
     public void addLogEvent(LogEvent logEvent) {
 	try {
