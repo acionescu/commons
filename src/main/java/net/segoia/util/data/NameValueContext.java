@@ -129,4 +129,25 @@ public class NameValueContext<P> extends ParameterContext<NameValue<P>>{
 	return false;
     }
     
+    public boolean matches(String regex) {
+	if(regex == null) {
+	    return false;
+	}
+	for(NameValue<P> nv : parameters.values()) {
+	    if(nv.getValue().toString().matches(regex)) {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    public static void main(String[] args) {
+	GenericNameValueList l = new GenericNameValueList();
+	
+	String s = "USER_TYPE:HAWPI:admin-RESOURCE_TYPE-ACCESS_TYPE:WRITE";
+	
+	l.addValue(s);
+	
+	System.out.println(l.matches(".*-RESOURCE_TYPE-ACCESS_TYPE:WRITE"));
+    }
 }
