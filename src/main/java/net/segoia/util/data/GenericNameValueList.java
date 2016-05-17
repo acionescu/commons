@@ -16,6 +16,10 @@
  */
 package net.segoia.util.data;
 
+import com.google.gson.Gson;
+
+import net.segoia.util.formatting.FormatUtil;
+
 public class GenericNameValueList extends GenericNameValueContext{
 
     /**
@@ -37,4 +41,12 @@ public class GenericNameValueList extends GenericNameValueContext{
 	return remove(""+index).getValue();
     }
 
+    public String toJsonString() {
+	return new Gson().toJson(getNameValuesAsMap().values());
+    }
+    
+    public String format(String separator,String itemEncloser,String start, String end) {
+	return FormatUtil.formatCollection(getNameValuesAsMap().values(), separator, itemEncloser, start, end);
+    }
+    
 }

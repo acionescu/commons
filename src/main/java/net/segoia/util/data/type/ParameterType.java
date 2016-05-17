@@ -19,6 +19,7 @@ package net.segoia.util.data.type;
 import java.io.Serializable;
 
 import net.segoia.util.data.GenericNameValue;
+import net.segoia.util.data.ObjectsUtil;
 import net.segoia.util.parser.Parser;
 import net.segoia.util.parser.ParserException;
 import net.segoia.util.parser.ParserHandlerFactory;
@@ -128,8 +129,11 @@ public class ParameterType implements Serializable {
 
 	ListType ml = (ListType) ParameterType.fromString("List[String]");
 	ListType mlc = (ListType) ParameterType.fromString("List[Any]");
-	System.out.println(ml.matches(mlc));
+	System.out.println(mlc.matches(ml));
 	// System.out.println(ParameterType.fromString("List[Context[id=String]]"));
+	System.out.println(ObjectsUtil.copy(mlc));
+	
+	
     }
 
     public String getType() {
