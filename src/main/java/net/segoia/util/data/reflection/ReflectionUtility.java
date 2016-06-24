@@ -487,7 +487,12 @@ public class ReflectionUtility {
 	    if (typeName.equals("String")) {
 		newValue = value;
 	    } else if (typeName.equals("int")) {
+		try {
 		return new Integer(value).intValue();
+		}
+		catch(NumberFormatException ex) {
+		    return new BigDecimal(value).intValue();
+		}
 	    } else if (typeName.equals("boolean")) {
 		return new Boolean(value).booleanValue();
 	    } else if (typeName.equals("long")) {

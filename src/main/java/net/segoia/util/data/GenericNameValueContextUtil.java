@@ -181,6 +181,10 @@ public class GenericNameValueContextUtil {
     }
 
     public static void main(String[] args) {
+	
+	String c = "{desc.type=String,pass.type=String,pass.secret=true,passagain.type=String,passagain.secret=true, pass.minLength=5, pass.maxLength=20, pass.regExp=/^(\\[0-9a-zA-Z\\])+$/}";
+	
+	GenericNameValueContextUtil.parse(c);
 	    }
 
 }
