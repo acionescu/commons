@@ -18,4 +18,6 @@ package net.segoia.util.logging;
 
 public interface LogManager extends LoggerFactory{
     Logger getLogger(Class<?> clazz);
+
+    Logger getLogger(String name, LoggerFactory loggerFactory);
 }

@@ -19,12 +19,14 @@ package net.segoia.util.data;
 import net.segoia.util.data.Cell;
 import net.segoia.util.data.Interval;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CellTest {
     char data;
 
     @Test
+    @Ignore
     public void testMatch() {
 	Cell index = new Cell();
 	index.indexMaximal(";*UaVuH)dtjg;BÁmÂ{I>Z5I");

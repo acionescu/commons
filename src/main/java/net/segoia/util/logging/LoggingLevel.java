@@ -17,9 +17,26 @@
 package net.segoia.util.logging;
 
 public enum LoggingLevel {
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR,
-    FATAL;
+    
+    TRACE(0),
+    DEBUG(1),
+    INFO(2),
+    WARN(3),
+    ERROR(4),
+    FATAL(5);
+    
+    private int level;
+    
+    LoggingLevel(int level){
+	this.level = level;
+    }
+
+    /**
+     * @return the level
+     */
+    public int getLevel() {
+        return level;
+    }
+    
+    
 }

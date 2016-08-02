@@ -26,6 +26,9 @@
    <description>Various Java Utils</description>
    <url>https://github.com/acionescu/commons</url>
    <packaging>jar</packaging>
+   <properties>
+      <additionalparam>-Xdoclint:none</additionalparam>
+   </properties>
    <licenses>
       <license>
          <name>The Apache Software License, Version 2.0</name>

@@ -29,7 +29,7 @@ public class ExecutionEntityWrapper<I, O, C> implements ExecutionEntity<I, O> {
 	C wrappedEntityConfiguration = config.getWrappedEntityConfiguration();
 	O result = null;
 	try {
-	    result = wrappedEntity.execute(new ExecutionContext(input, wrappedEntityConfiguration));
+	    result = wrappedEntity.execute(new ExecutionContext<I,C>(input, wrappedEntityConfiguration));
 	} catch (Exception e) {
 	    /* create exception context */
 	    EntityExceptionContext ec = new EntityExceptionContext(e, input, wrappedEntity, wrappedEntityConfiguration);

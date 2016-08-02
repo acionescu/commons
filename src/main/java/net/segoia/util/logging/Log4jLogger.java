@@ -16,8 +16,25 @@
  */
 package net.segoia.util.logging;
 
-public class Log4jLogger implements Logger{
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Level;
+
+public class Log4jLogger extends AbstractLogger{
     private org.apache.log4j.Logger log4jLogger;
+    private static final Map<LoggingLevel,Level> logToLog4jLevel;
+    
+    static {
+	logToLog4jLevel = new HashMap<LoggingLevel, Level>();
+	logToLog4jLevel.put(LoggingLevel.TRACE, Level.TRACE);
+	logToLog4jLevel.put(LoggingLevel.DEBUG, Level.DEBUG);
+	logToLog4jLevel.put(LoggingLevel.INFO, Level.INFO);
+	logToLog4jLevel.put(LoggingLevel.WARN, Level.WARN);
+	logToLog4jLevel.put(LoggingLevel.ERROR, Level.ERROR);
+	logToLog4jLevel.put(LoggingLevel.FATAL, Level.FATAL);
+    }
+    
 
     public Log4jLogger(org.apache.log4j.Logger log4jLogger) {
 	super();
@@ -82,19 +99,10 @@ public class Log4jLogger implements Logger{
 	throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isEnabled() {
-	throw new UnsupportedOperationException();
-    }
 
     @Override
-    public boolean isDebugEnabled() {
-	return log4jLogger.isDebugEnabled();
-    }
-
-    @Override
-    public boolean isInfoEnabled() {
-	return log4jLogger.isInfoEnabled();
+    void append(LoggingLevel ll, Object message, Throwable t) {
+	log4jLogger.log(logToLog4jLevel.get(ll), message, t);
     }
 
 }

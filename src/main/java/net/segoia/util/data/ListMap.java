@@ -77,6 +77,12 @@ public class ListMap<K,T> implements Serializable, Cloneable{
 	return false;
     }
     
+    public void removeValue(T value) {
+	for(List<T> list : backedMap.values()) {
+	    list.remove(value);
+	}
+    }
+    
     public List<T> get(K key){
 	return backedMap.get(key);
     }

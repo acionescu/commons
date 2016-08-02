@@ -19,11 +19,10 @@ package net.segoia.util.logging;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class DefaultLogManager implements LogManager{
+public class DefaultLogManager implements LogManager {
     private LoggerFactory defaultLoggerFactory = new SystemOutLoggerFactory();
     private Logger defaultLogger = new SystemOutLogger("DefaultLogger");
-    private Map<String,Logger> loggers = new Hashtable<String, Logger>();
-    
+    private Map<String, Logger> loggers = new Hashtable<String, Logger>();
 
     public DefaultLogManager(LoggerFactory defaultLoggerFactory, Logger defaultLogger) {
 	super();
@@ -38,11 +37,21 @@ public class DefaultLogManager implements LogManager{
 
     public synchronized Logger getLogger(String name) {
 	Logger logger = loggers.get(name);
-	if(logger == null){
-	    if(defaultLoggerFactory == null){
+	if (logger == null) {
+	    if (defaultLoggerFactory == null) {
 		return defaultLogger;
 	    }
 	    logger = defaultLoggerFactory.getLogger(name);
+	    loggers.put(name, logger);
+	}
+	return logger;
+    }
+
+    @Override
+    public synchronized Logger getLogger(String name, LoggerFactory loggerFactory) {
+	Logger logger = loggers.get(name);
+	if (logger == null) {
+	    logger = loggerFactory.getLogger(name);
 	    loggers.put(name, logger);
 	}
 	return logger;
@@ -53,14 +62,14 @@ public class DefaultLogManager implements LogManager{
     }
 
     public LoggerFactory getDefaultLoggerFactory() {
-        return defaultLoggerFactory;
+	return defaultLoggerFactory;
     }
 
     public Logger getDefaultLogger() {
-        return defaultLogger;
+	return defaultLogger;
     }
 
     public void setDefaultLoggerFactory(LoggerFactory defaultLoggerFactory) {
-        this.defaultLoggerFactory = defaultLoggerFactory;
+	this.defaultLoggerFactory = defaultLoggerFactory;
     }
 }

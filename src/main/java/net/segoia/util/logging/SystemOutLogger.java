@@ -20,7 +20,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SystemOutLogger implements Logger {
+public class SystemOutLogger extends AbstractLogger {
     private String name;
     private PrintStream out = System.out;
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); 
@@ -61,21 +61,6 @@ public class SystemOutLogger implements Logger {
 	trace(LoggingLevel.INFO,message,null);
     }
 
-    public boolean isDebugEnabled() {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    public boolean isEnabled() {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    public boolean isInfoEnabled() {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
     public void warn(Object message, Throwable t) {
 	trace(LoggingLevel.WARN,message,t);    }
 
@@ -84,14 +69,19 @@ public class SystemOutLogger implements Logger {
     }
     
     public void append(Object message){
-	out.println(message);
+	flush(message.toString());
     }
 
     private void flush(String output) {
 	out.println(output);
     }
 
-    private void trace(LoggingLevel ll, Object message, Throwable t) {
+    private void printDate(StringBuffer sb) {
+	sb.append("[").append(dateFormat.format(new Date())).append("]");
+    }
+
+    @Override
+    void append(LoggingLevel ll, Object message, Throwable t) {
 	StringBuffer sb = new StringBuffer(256);
 	sb.append(name);
 	sb.append("[").append(ll.name()).append("]");
@@ -101,10 +91,9 @@ public class SystemOutLogger implements Logger {
 	    sb.append(" - ");
 	    LoggingUtil.printThrowable(t, sb);
 	}
-	flush(sb.toString());
+	append(sb);
+	
     }
     
-    private void printDate(StringBuffer sb) {
-	sb.append("[").append(dateFormat.format(new Date())).append("]");
-    }
+    
 }

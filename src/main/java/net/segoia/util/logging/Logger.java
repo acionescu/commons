@@ -35,4 +35,9 @@ public interface Logger {
     boolean isEnabled();
     boolean isDebugEnabled();
     boolean isInfoEnabled();
+    boolean trace(LoggingLevel ll, Object message, Throwable t);
+    void setLogLevel(LoggingLevel logLevel);
+    void setEnabled(boolean enabled);
+    LoggingLevel getLogLevel();
+    
 }

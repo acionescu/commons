@@ -27,6 +27,10 @@ public class MasterLogManager{
     public static Logger getLogger(String name) {
 	return defaultLogManager.getLogger(name);
     }
+    
+    public static Logger getLogger(String name, LoggerFactory loggerFactory) {
+	return defaultLogManager.getLogger(name,loggerFactory);
+    }
 
     public static LogManager getDefaultLogManager() {
         return defaultLogManager;
