@@ -69,6 +69,7 @@ public class CellTest {
 	
     }
 
+    @Ignore
     @Test
     public void testRandomCell() {
 	Cell c = generateRandomExecutionCell(10);
