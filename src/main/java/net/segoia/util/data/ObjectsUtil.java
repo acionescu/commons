@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -76,5 +77,14 @@ public class ObjectsUtil {
 	    return o1.equals(o2);
 	}
 	return o2==null;
+    }
+    
+    public  static <T> T shallowCopy(Object obj) {
+	try {
+	    return (T)obj.getClass().getMethod("clone", new Class[0]).invoke(obj);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} 
+	return null;
     }
 }

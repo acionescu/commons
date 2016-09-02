@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -39,7 +40,7 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	nestedSetFactory = new HashSetFactory<V>();
     }
 
-    private SetMap(Map<K, Set<V>> nestedMap, SetFactory<V> setFactory) {
+    public SetMap(Map<K, Set<V>> nestedMap, SetFactory<V> setFactory) {
 	this.nestedMap = nestedMap;
 	this.nestedSetFactory = setFactory;
     }
@@ -168,11 +169,11 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	return nestedMap.entrySet();
     }
 
-    private static interface SetFactory<T> extends Serializable{
+    public static interface SetFactory<T> extends Serializable{
 	Set<T> createSet();
     }
 
-    private static class HashSetFactory<T> implements SetFactory<T> {
+    public static class HashSetFactory<T> implements SetFactory<T> {
 
 	/**
 	 * 
@@ -186,7 +187,7 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 
     }
 
-    private static class TreeSetFactory<T> implements SetFactory<T> {
+    public static class TreeSetFactory<T> implements SetFactory<T> {
 
 	/**
 	 * 
@@ -198,5 +199,14 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	    return new TreeSet<T>();
 	}
 
+    }
+    
+    public static class LinkedHashSetFactory<T> implements SetFactory<T> {
+
+	@Override
+	public Set<T> createSet() {
+	    return new LinkedHashSet<T>();
+	}
+	
     }
 }
