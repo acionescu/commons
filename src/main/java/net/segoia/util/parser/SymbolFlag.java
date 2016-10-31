@@ -42,5 +42,6 @@ public interface SymbolFlag {
     /* added to the GROUP_START will make the parse handler to create a set with the types of the objects in the present group */
     public static final String FOLLOW_TYPES="FOLLOW_TYPES";
     
-    
+    /* use this flag on DOC_START to start a group when starting parsing */
+    public static final String GROUP_START="GROUP_START";
 }

@@ -26,12 +26,15 @@ public class ParseContextConfig {
     private boolean useEscapeCharacterOn;
     private boolean overrideSuperContextConfig;
     private boolean docStartEventOn;
+    
+    private Symbol docStartSymbol;
 
     private List<String> flags = new ArrayList<String>();
     
     public void configFromSymbol(Symbol s) {
 	addFlags(s.getFlags());
 	setDocStartEventOn(true);
+	docStartSymbol = s;
     }
     
 
@@ -156,6 +159,14 @@ public class ParseContextConfig {
     public void setDocStartEventOn(boolean docStartEventOn) {
         this.docStartEventOn = docStartEventOn;
     }
-    
-    
+
+
+    public Symbol getDocStartSymbol() {
+        return docStartSymbol;
+    }
+
+
+    public void setDocStartSymbol(Symbol docStartSymbol) {
+        this.docStartSymbol = docStartSymbol;
+    }
 }

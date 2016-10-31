@@ -20,7 +20,7 @@ import java.net.URLEncoder;
 
 public class SqlUtil {
     public static String sanitizeStringValues(String input) {
-	return input.replace("'", "''").replace("\\", "\\\\");
+	return input.replace("'", "''");//.replace("\\", "\\\\");
     }
 
     public static void main(String[] args) throws Exception {

@@ -52,10 +52,10 @@ public class ParseHandler {
 	// System.out.println("found " + symbol.getSequence() + " at " + startIndex + " : " + content);
 	SymbolType symbolType = symbol.getType();
 	if (atomicGroupStarted) { /* we have an atomic group already started */
-	    if (!symbol.equals(previousSymbol)) { /*
-						   * this is not the expected atomic group separator, it will not be
-						   * processed
-						   */
+	    if (!symbol.equals(
+		    previousSymbol)) { /*
+				        * this is not the expected atomic group separator, it will not be processed
+				        */
 		/* append to pending content. append also the symbol sequence */
 		appendToPendingContent(content + symbol.getSequence());
 		return;
@@ -127,9 +127,9 @@ public class ParseHandler {
 	}
 	return false;
     }
-    
+
     private boolean checkActiveContextFlag(String flag) {
-	if(activeContexts.size() > 0) {
+	if (activeContexts.size() > 0) {
 	    return activeContexts.peek().containsFlag(flag);
 	}
 	return false;
@@ -169,18 +169,37 @@ public class ParseHandler {
 
     public void onStartOfFile(ParseContextConfig context) {
 	activeContexts.push(context);
+	if (context.containsFlag(SymbolFlag.GROUP_START)) {
+	    try {
+		handleStartGroup(context.getDocStartSymbol(), 0, "");
+	    } catch (ContextAwareException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
     }
 
     public void onEndOfFile(String content) throws ParserException, ContextAwareException {
 	while (waitingStack.size() > 0) {
-	    List<Symbol> pairSymbols = waitingStack.pop().getSymbol().getPairSymbols();
-
-	    /* if at least one pair symbol is multiple don't mention the error */
+	    WaitInfo wi = waitingStack.pop();
+	    Symbol contextSymbol = wi.getSymbol();
+	    List<Symbol> pairSymbols = contextSymbol.getPairSymbols();
+	    
 	    boolean allowed = false;
-	    for (Symbol ps : pairSymbols) {
-		if (ps.containsFlag(SymbolFlag.MULTIPLE)) {
-		    allowed = true;
-		    break;
+	    if (contextSymbol.getType().equals(SymbolType.GROUP_END_START)) {
+		handleEndGroup(contextSymbol, wi.getFoundIndex(), content);
+		return;
+		
+	    } else {
+		
+
+		/* if at least one pair symbol is multiple don't mention the error */
+
+		for (Symbol ps : pairSymbols) {
+		    if (ps.containsFlag(SymbolFlag.MULTIPLE)) {
+			allowed = true;
+			break;
+		    }
 		}
 	    }
 	    if (!allowed) {
@@ -199,8 +218,8 @@ public class ParseHandler {
 		content = trimmedContent;
 	    }
 	} else {
-	    add = (previousSymbol != null && (previousSymbol.getType().equals(SymbolType.SEPARATE) || previousSymbol
-		    .getType().equals(SymbolType.ASSOCIATE)));
+	    add = (previousSymbol != null && (previousSymbol.getType().equals(SymbolType.SEPARATE)
+		    || previousSymbol.getType().equals(SymbolType.ASSOCIATE)));
 
 	}
 	;
@@ -254,7 +273,7 @@ public class ParseHandler {
 
 		GroupEvent ge = new GroupEvent();
 		ge.setEndSymbol(symbol);
-		
+
 		ge.setStartSymbol(startGroupSymbol);
 		ge.setStartIndex(wi.getFoundIndex());
 		ge.setObjects(objects);
@@ -319,7 +338,7 @@ public class ParseHandler {
 	    isAssociation = prevSymbolType.equals(SymbolType.ASSOCIATE);
 	}
 
-	boolean isEmptyAndIgnorable = content.trim().isEmpty() && checkActiveContextFlag(SymbolFlag.IGNORE_EMPTY);//checkGroupFlag(SymbolFlag.IGNORE_EMPTY);
+	boolean isEmptyAndIgnorable = content.trim().isEmpty() && checkActiveContextFlag(SymbolFlag.IGNORE_EMPTY);// checkGroupFlag(SymbolFlag.IGNORE_EMPTY);
 
 	if (prevSymbolType != null && (isSeparate || isAssociation)) {
 	    // /* if the last stared group ignores empty elements and this is string is empty do nothig */
@@ -334,7 +353,8 @@ public class ParseHandler {
 	}
     }
 
-    private void handleUniqueGroupSeparator(Symbol symbol, int startIndex, String content) throws ContextAwareException {
+    private void handleUniqueGroupSeparator(Symbol symbol, int startIndex, String content)
+	    throws ContextAwareException {
 	if (waitingStack.size() == 0) {
 	    atomicGroupStarted = true;
 	    handleStartGroup(symbol, startIndex, content);
