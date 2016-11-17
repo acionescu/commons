@@ -29,11 +29,19 @@ public class ParseManager {
 	if (p == null) {
 	    p = new Parser();
 	    p.addSymbols(parserConfig.getSymbols());
-	    p.getParseContextConfig().getNestedSymbols().setCaseInsensitive(parserConfig.isCaseInsensitive());
+	    ParseContextConfig parseContextConfig = p.getParseContextConfig();
+	    parseContextConfig.getNestedSymbols().setCaseInsensitive(parserConfig.isCaseInsensitive());
 	    ParseEventHandlerConfig parseEventHandlerConfig = parserConfig.getParseEventHandlerConfig();
 	    if (parseEventHandlerConfig != null) {
 		p.setHandlerFactory(new ParserHandlerFactory(new ConfigurableParseEventHandler(parseEventHandlerConfig)));
 	    }
+	    
+	    String inputEscapeChar = parserConfig.getInputEscapeChar();
+	    if(inputEscapeChar != null) {
+		parseContextConfig.setEscapeCharacter(inputEscapeChar);
+		parseContextConfig.setUseEscapeCharacterOn(true);
+	    }
+	    
 	    parsers.put(parserConfig, p);
 	}
 	return p.parse(input);

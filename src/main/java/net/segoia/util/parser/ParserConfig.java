@@ -19,7 +19,8 @@ package net.segoia.util.parser;
 public class ParserConfig {
     private String symbols;
     private boolean caseInsensitive;
-    private ParseEventHandlerConfig parseEventHandlerConfig;/*=new ParseEventHandlerConfig("\\[{", "\\");*/
+    private ParseEventHandlerConfig parseEventHandlerConfig;/* =new ParseEventHandlerConfig("\\[{", "\\"); */
+    private String inputEscapeChar;
 
     public ParserConfig(String symbols, String outputCharsToBeEscaped, String outputEscapeChar) {
 	super();
@@ -63,17 +64,28 @@ public class ParserConfig {
      * @return the caseInsensitive
      */
     public boolean isCaseInsensitive() {
-        return caseInsensitive;
+	return caseInsensitive;
     }
 
     /**
-     * @param caseInsensitive the caseInsensitive to set
+     * @param caseInsensitive
+     *            the caseInsensitive to set
      */
     public void setCaseInsensitive(boolean caseInsensitive) {
-        this.caseInsensitive = caseInsensitive;
+	this.caseInsensitive = caseInsensitive;
     }
 
-    /* (non-Javadoc)
+    public String getInputEscapeChar() {
+	return inputEscapeChar;
+    }
+
+    public void setInputEscapeChar(String inputEscapeChar) {
+	this.inputEscapeChar = inputEscapeChar;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -86,7 +98,9 @@ public class ParserConfig {
 	return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -112,7 +126,5 @@ public class ParserConfig {
 	    return false;
 	return true;
     }
-
-   
 
 }

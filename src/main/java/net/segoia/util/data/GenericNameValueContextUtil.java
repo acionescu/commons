@@ -132,7 +132,12 @@ public class GenericNameValueContextUtil {
 	    if (list.get(0) instanceof GenericNameValue) {
 		GenericNameValueContext mapContext = new GenericNameValueContext();
 		try {
-		    mapContext.putAll(list);
+//		    mapContext.putAll(list);
+		    for(Object item : list) {
+			GenericNameValue nvi = (GenericNameValue)item;
+			mapContext.put(nvi.getName(), convertToKnownType(nvi.getValue()));
+		    }
+		    
 		    return mapContext;
 		} catch (ClassCastException e) {
 		    /* do nothing just fallback to the default */
