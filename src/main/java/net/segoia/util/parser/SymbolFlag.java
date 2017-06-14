@@ -27,7 +27,7 @@ public interface SymbolFlag {
     /* specifies that any character from the symbol string can be used for matching */
     public static final String ANYCHAR="ANYCHAR";
     /* 
-     * when used, the parser will not stop at the first occurence of the searched symbol, but will 
+     * when used, the parser will not stop at the first occurrence of the searched symbol, but will 
      * continue, as long as the symbol is found
      */
     public static final String REPEATABLE="REPEATABLE";
@@ -44,4 +44,6 @@ public interface SymbolFlag {
     
     /* use this flag on DOC_START to start a group when starting parsing */
     public static final String GROUP_START="GROUP_START";
+    /* use this flag on any symbol, to keep its sequence in the output */
+    public static final String KEEP="KEEP";
 }

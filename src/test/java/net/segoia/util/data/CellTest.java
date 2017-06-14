@@ -53,7 +53,7 @@ public class CellTest {
 		+ "\n" + "In international scientific vocabulary semantics is also called semasiology.";
 
 	Cell index = new Cell();
-	// index.digest(input);
+//	index.indexMaximal(input);
 	index.indexMinimal(input);
 
 	StringBuffer sb = new StringBuffer();
@@ -62,10 +62,20 @@ public class CellTest {
 
 	Cell stopChars = new Cell();
 	stopChars.tokens(" ,.[]{}();:'\"");
+	
+	System.out.println(index.getRefValue('o', false).printRefsWithStrength());
+	
+	System.out.println(index.findMatchPos("Sema "));
 
-	 System.out.println(index.getRefValue(' ', false).printValuesWithDepth(new StringBuffer(), 5, "", stopChars, 0));
+//	 System.out.println(index.getRefValue(' ', false).printValuesWithDepth(new StringBuffer(), 5, "", stopChars, 0));
 
 	// System.out.println(index.getRefValue('o', false).printRefsWithStrength());
+	 
+//	 Cell search = index.search(" sem ");
+//	 
+//	 System.out.println(search.printRefsWithStrength());
+	 
+	 
 	
     }
 

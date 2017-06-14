@@ -83,6 +83,11 @@ public class ContextAwareException extends Exception {
 	super(cause);
 	this.type = type;
     }
+    
+    protected ContextAwareException addExceptionParameter(String name, Object value) {
+	exceptionContext.put(name, value);
+	return this;
+    }
 
     public String getMessage() {
 	if (message == null) {

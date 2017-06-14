@@ -98,6 +98,10 @@ public class Parser {
 		prevMatch = searchAndHandle(handler, source, prevMatch);
 	    }
 	    // handler.onEndOfFile(input.substring(previousMatchIndex));
+	    
+	    if (prevMatch != null && prevMatch.getSymbol().containsFlag(SymbolFlag.REPEATABLE)) {
+		handleSymbol(handler, prevMatch.getSymbol(), prevMatch.getContent(), prevMatch.getPosition());
+	    }
 
 	    handler.onEndOfFile(source.readFromCheckPoint(input.length() - source.getCheckPoint()));
 	} catch (Exception pe) {
@@ -178,7 +182,6 @@ public class Parser {
 
     private void handleSymbol(ParseHandler handler, Symbol symbol, String content, int startIndex)
 	    throws ContextAwareException {
-	// handler.handleStartedGroups(symbol);
 	handler.onNewSymbolFound(symbol, startIndex, content);
     }
 

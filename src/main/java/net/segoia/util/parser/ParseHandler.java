@@ -68,15 +68,18 @@ public class ParseHandler {
 	switch (symbolType) {
 	case GROUP_START:
 	    handleStartGroup(symbol, startIndex, content);
+	    checkKeep(symbol);
 	    break;
 	case GROUP_END:
 	    handleEndGroup(symbol, startIndex, content);
+	    checkKeep(symbol);
 	    break;
 	case ASSOCIATE:
 	    handleAssociate(symbol, startIndex, content);
 	    break;
 	case SEPARATE:
 	    handleSeparate(symbol, startIndex, content);
+	    checkKeep(symbol);
 	    break;
 	case GROUP_END_START:
 	    handleEndGroup(symbol, startIndex, content);
@@ -89,6 +92,12 @@ public class ParseHandler {
 	previousSymbol = symbol;
 	// System.out.println("waiting = " + waitingStack);
 	// System.out.println("available = " + availableStack);
+    }
+    
+    private void checkKeep(Symbol symbol) {
+	if (symbol.containsFlag(SymbolFlag.KEEP)) {
+	    makeSymbolAvailable(symbol);
+	}
     }
 
     private void appendToPendingContent(String content) {
@@ -186,7 +195,8 @@ public class ParseHandler {
 	    List<Symbol> pairSymbols = contextSymbol.getPairSymbols();
 	    
 	    boolean allowed = false;
-	    if (contextSymbol.getType().equals(SymbolType.GROUP_END_START)) {
+	    SymbolType cst = contextSymbol.getType();
+	    if (cst.equals(SymbolType.GROUP_END_START) || ( cst.equals(SymbolType.DOC_START) && contextSymbol.containsFlag(SymbolFlag.GROUP_START) ) ) {
 		handleEndGroup(contextSymbol, wi.getFoundIndex(), content);
 		return;
 		
@@ -338,10 +348,10 @@ public class ParseHandler {
 	    isAssociation = prevSymbolType.equals(SymbolType.ASSOCIATE);
 	}
 
-	boolean isEmptyAndIgnorable = content.trim().isEmpty() && checkActiveContextFlag(SymbolFlag.IGNORE_EMPTY);// checkGroupFlag(SymbolFlag.IGNORE_EMPTY);
+	boolean isEmptyAndIgnorable = content.trim().isEmpty() && (symbol.containsFlag(SymbolFlag.IGNORE_EMPTY) || checkActiveContextFlag(SymbolFlag.IGNORE_EMPTY));
 
 	if (prevSymbolType != null && (isSeparate || isAssociation)) {
-	    // /* if the last stared group ignores empty elements and this is string is empty do nothig */
+	    // /* if the last stored group ignores empty elements and this string is empty do nothing */
 	    if (isAssociation || !isEmptyAndIgnorable) {
 		Object handledContent = eventHandler.handleEmptyString(content);
 		makeAvailable(handledContent);
@@ -406,6 +416,15 @@ public class ParseHandler {
 	ae.setPrefixValue(wi.getPreviousValue());
 	ae.setPostfixValue(input);
 	makeAvailable(eventHandler.handleAssociationEvent(ae));
+    }
+    
+    /**
+     * Used to inject in the output the sequence of the current symbol
+     * @param symbol
+     */
+    private void makeSymbolAvailable(Symbol symbol) {
+	String sequence = symbol.getSequence();
+	availableStack.push(sequence);
     }
 
     private void makeAvailable(Object input) throws ContextAwareException {
