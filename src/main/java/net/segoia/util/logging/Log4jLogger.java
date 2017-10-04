@@ -105,4 +105,11 @@ public class Log4jLogger extends AbstractLogger{
 	log4jLogger.log(logToLog4jLevel.get(ll), message, t);
     }
 
+    @Override
+    public boolean isDebugEnabled() {
+	return log4jLogger.isDebugEnabled();
+    }
+
+    
+    
 }
