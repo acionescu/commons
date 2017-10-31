@@ -45,6 +45,10 @@ public class GenericNameValueList extends GenericNameValueContext{
 	return new Gson().toJson(getNameValuesAsMap().values());
     }
     
+    public String toJsonStringFull() {
+	return new Gson().toJson(getNameValuesAsMapFull().values());
+    }
+    
     public String format(String separator,String itemEncloser,String start, String end) {
 	return FormatUtil.formatCollection(getNameValuesAsMap().values(), separator, itemEncloser, start, end);
     }

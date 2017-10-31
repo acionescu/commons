@@ -113,8 +113,29 @@ public class NameValueContext<P> extends ParameterContext<NameValue<P>>{
 	return map;
     }
     
+    public Map<String, Object> getNameValuesAsMapFull(){
+	LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+	for(Map.Entry<String, NameValue<P>> entry : parameters.entrySet()){
+	    NameValue<P> p = entry.getValue();
+	    P value = p.getValue();
+	    if(value instanceof NameValueContext) {
+		NameValueContext c = (NameValueContext)value;
+		map.put(p.getName(), c.getNameValuesAsMapFull());
+	    }
+	    else {
+		map.put(p.getName(), value);
+	    }
+	    
+	}
+	return map;
+    }
+    
     public String toJsonString() {
 	return new Gson().toJson(getNameValuesAsMap());
+    }
+    
+    public String toJsonStringFull() {
+	return new Gson().toJson(getNameValuesAsMapFull());
     }
     
     public boolean containsValue(P value) {
