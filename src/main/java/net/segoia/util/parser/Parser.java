@@ -95,12 +95,15 @@ public class Parser {
 		 * startIndex++; currentIndex = startIndex + 1; } potentialMatch |= (startIndex == currentIndex); if
 		 * (potentialMatch) { currentIndex++; }
 		 */
+		
 		prevMatch = searchAndHandle(handler, source, prevMatch);
 	    }
 	    // handler.onEndOfFile(input.substring(previousMatchIndex));
 	    
 	    if (prevMatch != null && prevMatch.getSymbol().containsFlag(SymbolFlag.REPEATABLE)) {
+		
 		handleSymbol(handler, prevMatch.getSymbol(), prevMatch.getContent(), prevMatch.getPosition());
+		
 	    }
 
 	    handler.onEndOfFile(source.readFromCheckPoint(input.length() - source.getCheckPoint()));
@@ -141,7 +144,13 @@ public class Parser {
 			handleSymbol(handler, prevMatch.getSymbol(), prevMatch.getContent(), prevMatch.getPosition());
 		    }
 		    match = new Match(s, content, seq, source.getOffset());
+		    try {
 		    handleSymbol(handler, s, content, source.getOffset());
+		    }
+			catch(Exception e) {
+			    System.out.println("Failed to handle symbol "+s+", offset="+source.getOffset());
+			    throw e;
+			}
 		    // if (SymbolFlags.MULTIPLE.equals(s.getAction())) {
 		    if (s.containsFlag(SymbolFlag.MULTIPLE)) {
 			groupEndFound = true;

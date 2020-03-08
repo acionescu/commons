@@ -16,9 +16,9 @@
  */
 package net.segoia.util.execution;
 
+import java.rmi.Remote;
 
-
-public interface ExecutionEntity<I,O>{
+public interface ExecutionEntity<I,O> extends Remote{
     
     O execute(I input) throws Exception;
 
