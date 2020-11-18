@@ -162,6 +162,7 @@ public class CryptoUtil {
     }
 
     public static byte[] loadKeyFromFile(String fileName) throws IOException {
+	System.out.println("Loading key from file "+fileName);
 	return Base64.getDecoder().decode(Files.readAllBytes(new File(fileName).toPath()));
     }
 
@@ -177,6 +178,21 @@ public class CryptoUtil {
     public static boolean saveKey(byte[] bytes, String file) throws IOException {
 	FileOutputStream fos = new FileOutputStream(file);
 	fos.write(base64Encode(bytes).getBytes(Charset.forName("UTF-8")));
+	fos.close();
+
+	return true;
+    }
+    
+    public static boolean saveKey(byte[] bytes, String file, boolean encodeToBase64) throws IOException {
+	FileOutputStream fos = new FileOutputStream(file);
+	
+	byte[] bytesToWrite = bytes;
+	
+	if(encodeToBase64) {
+	    bytesToWrite = base64Encode(bytes).getBytes(Charset.forName("UTF-8"));
+	}
+	
+	fos.write(bytesToWrite);
 	fos.close();
 
 	return true;
@@ -297,5 +313,10 @@ public class CryptoUtil {
 	SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 	
 	return secret;
+    }
+    
+    public static String generate6DigitsPasscode() {
+	int c = 100000 + (int) Math.ceil(Math.random() * 899999);
+	return "" + c;
     }
 }

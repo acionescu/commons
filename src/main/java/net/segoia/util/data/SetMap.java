@@ -47,13 +47,11 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 
     public static <K, V> SetMap<K, V> createHashMapWithHashSet() {
 
-	return new SetMap<K, V>(new HashMap<K, Set<V>>(),
-		new SetMap.HashSetFactory<V>());
+	return new SetMap<K, V>(new HashMap<K, Set<V>>(), new SetMap.HashSetFactory<V>());
     }
 
     public static <K, V> SetMap<K, V> createTreeMapWithTreeSet() {
-	return new SetMap<K, V>(new TreeMap<K, Set<V>>(),
-		new SetMap.TreeSetFactory<V>());
+	return new SetMap<K, V>(new TreeMap<K, Set<V>>(), new SetMap.TreeSetFactory<V>());
     }
 
     public void add(K key, V value) {
@@ -104,8 +102,8 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	}
 	return union;
     }
-    
-    public Map<K,Set<V>> getAll(){
+
+    public Map<K, Set<V>> getAll() {
 	return nestedMap;
     }
 
@@ -144,6 +142,20 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	return nestedMap.remove(key);
     }
 
+    public boolean removeValueForKey(Object key, V value) {
+	Set<V> set = get(key);
+	if (set != null) {
+	    boolean removed = set.remove(value);
+	    if (set.isEmpty()) {
+		/* remote set record if empty */
+		remove(key);
+	    }
+	    return removed;
+	}
+
+	return true;
+    }
+
     @Override
     public void putAll(Map<? extends K, ? extends Set<V>> m) {
 	nestedMap.putAll(m);
@@ -169,7 +181,7 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	return nestedMap.entrySet();
     }
 
-    public static interface SetFactory<T> extends Serializable{
+    public static interface SetFactory<T> extends Serializable {
 	Set<T> createSet();
     }
 
@@ -200,13 +212,13 @@ public class SetMap<K, V> implements Map<K, Set<V>>, Serializable {
 	}
 
     }
-    
+
     public static class LinkedHashSetFactory<T> implements SetFactory<T> {
 
 	@Override
 	public Set<T> createSet() {
 	    return new LinkedHashSet<T>();
 	}
-	
+
     }
 }

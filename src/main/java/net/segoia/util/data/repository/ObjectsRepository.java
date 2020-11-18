@@ -30,9 +30,8 @@ import net.segoia.util.data.SetMap;
 import net.segoia.util.data.reflection.ReflectionUtility;
 
 /**
- * Implements a repository for a certain type of object (all the objects should
- * share a common interface) this can also be used as a repository of
- * repositories
+ * Implements a repository for a certain type of object (all the objects should share a common interface) this can also
+ * be used as a repository of repositories
  * 
  * @author adi
  * 
@@ -44,8 +43,8 @@ public class ObjectsRepository<O> implements Serializable {
      */
     private static final long serialVersionUID = -2852851812850022179L;
     /**
-     * keeps a map with all the maps used to search objects by certain
-     * properties </br> key - the name of the property used to search </br>
+     * keeps a map with all the maps used to search objects by certain properties </br>
+     * key - the name of the property used to search </br>
      * value - the map with all the mapped values for the property
      */
     private Map<String, SetMap<Object, O>> indexMap = new TreeMap<String, SetMap<Object, O>>();
@@ -101,8 +100,7 @@ public class ObjectsRepository<O> implements Serializable {
     }
 
     /**
-     * adds the current object to the indexes according to the specified index
-     * properties
+     * adds the current object to the indexes according to the specified index properties
      * 
      * @param obj
      */
@@ -118,8 +116,7 @@ public class ObjectsRepository<O> implements Serializable {
 		}
 		listMap.add(value, obj);
 	    } catch (Exception e) {
-		System.out.println("Error building index for prop " + prop
-			+ " on object " + obj);
+		System.out.println("Error building index for prop " + prop + " on object " + obj);
 		e.printStackTrace();
 		/* do nothing */
 	    }
@@ -127,15 +124,13 @@ public class ObjectsRepository<O> implements Serializable {
     }
 
     /**
-     * Returns the list of objects that have the specified value for the
-     * property
+     * Returns the list of objects that have the specified value for the property
      * 
      * @param propName
      * @param propValue
      * @return
      */
-    public Collection<O> getObjectsForProperty(String propName,
-	    Object propValue) {
+    public Collection<O> getObjectsForProperty(String propName, Object propValue) {
 	SetMap<Object, O> valuesMap = indexMap.get(propName);
 	if (valuesMap == null) {
 	    return null;
@@ -144,8 +139,7 @@ public class ObjectsRepository<O> implements Serializable {
     }
 
     /**
-     * Will return the first object from the list found for the specified search
-     * criteria
+     * Will return the first object from the list found for the specified search criteria
      * 
      * @param propName
      * @param propValue
@@ -156,22 +150,19 @@ public class ObjectsRepository<O> implements Serializable {
 	if (valCol == null || valCol.size() == 0) {
 	    return null;
 	}
-	List<O> valList = new ArrayList<O>(valCol);
-
-	return valList.get(0);
+//	List<O> valList = new ArrayList<O>(valCol);
+//	return valList.get(0);
+	return valCol.iterator().next();
     }
 
-    public Map<Object, O> getObjectsMapForProperty(String searchPropName,
-	    Object searchValue, String keyPropName) {
-	Collection<O> list = getObjectsForProperty(searchPropName,
-		searchValue);
+    public Map<Object, O> getObjectsMapForProperty(String searchPropName, Object searchValue, String keyPropName) {
+	Collection<O> list = getObjectsForProperty(searchPropName, searchValue);
 	return (Map) ObjectsUtil.createMapFromCollection(list, keyPropName);
     }
 
     /**
-     * Returns a map with the keys representing the possible values for the
-     * specified property and the value representing the list with the objects
-     * that have the property value equal with the key
+     * Returns a map with the keys representing the possible values for the specified property and the value
+     * representing the list with the objects that have the property value equal with the key
      * 
      * @param propName
      * @return
@@ -199,5 +190,53 @@ public class ObjectsRepository<O> implements Serializable {
 	}
 	Collection<O> objectsList = valuesMap.get(propValue);
 	return (objectsList != null && objectsList.size() > 0);
+    }
+
+    private void removeIndexesForObject(O obj) {
+	for (String prop : indexProperties) {
+	    try {
+		Object value = ReflectionUtility.getValueForField(obj, prop);
+		/* get the map for the current property */
+		SetMap<Object, O> listMap = indexMap.get(prop);
+		if (listMap != null) {
+		    listMap.removeValueForKey(value, obj);
+		}
+	    } catch (Exception e) {
+		System.out.println("Error building index for prop " + prop + " on object " + obj);
+		e.printStackTrace();
+		/* do nothing */
+	    }
+	}
+    }
+    
+    public boolean removeObject(O obj) {
+	boolean removed = allObjects.remove(obj);
+	if (removed) {
+	    removeIndexesForObject(obj);
+	}
+	return removed;
+    }
+    
+    public ObjectsRepositoryResponse<O> removeObjectForProperty(String propName, Object propValue) {
+	Collection<O> objectsForProperty = getObjectsForProperty(propName, propValue);
+	List<Exception> errors=null;
+	Collection<O> results = new HashSet<>();
+	if(objectsForProperty != null) {
+//	    System.out.println(this+" removing "+objectsForProperty.size()+" objects for prop "+propName+"->"+propValue);
+	    for(O obj : objectsForProperty) {
+		boolean removed = removeObject(obj);
+		if(!removed) {
+		    if(errors == null) {
+			errors=new ArrayList<>();
+		    }
+		    errors.add(new RuntimeException("Failed to remove object "+obj+" but indexed for "+propName+"->"+propValue));
+		}
+		else {
+		    results.add(obj);
+		}
+	    }
+	}
+	
+	return new ObjectsRepositoryResponse<>(results, errors);
     }
 }

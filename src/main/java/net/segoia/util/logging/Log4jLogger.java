@@ -43,7 +43,9 @@ public class Log4jLogger extends AbstractLogger{
 
     @Override
     public void debug(Object message, Throwable t) {
-	log4jLogger.debug(message, t);
+	if(log4jLogger.isDebugEnabled()) {
+	    log4jLogger.debug(message, t);
+	}
     }
 
     @Override

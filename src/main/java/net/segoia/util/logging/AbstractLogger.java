@@ -50,7 +50,7 @@ public abstract class AbstractLogger implements Logger {
 	return (logLevel.getLevel() <= LoggingLevel.INFO.getLevel());
     }
 
-    protected boolean isLogLevelAllowed(LoggingLevel ll) {
+    public boolean isLogLevelAllowed(LoggingLevel ll) {
 	return logLevel.getLevel() <= ll.getLevel();
     }
 

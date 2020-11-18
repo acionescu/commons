@@ -39,5 +39,6 @@ public interface Logger {
     void setLogLevel(LoggingLevel logLevel);
     void setEnabled(boolean enabled);
     LoggingLevel getLogLevel();
+    boolean isLogLevelAllowed(LoggingLevel ll);
     
 }
